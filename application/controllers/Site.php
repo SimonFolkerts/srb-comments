@@ -13,11 +13,11 @@ class Site extends CI_Controller {
     function index($video_id = null, $comment_id = null) {
         if (isset($video_id)) {
             //get a video
-            $query = $this->db->query('SELECT * FROM videos WHERE id = ' . $video_id);
+            $query = $this->db->query('SELECT * FROM videos WHERE id = ?', array($video_id));
             $data['video'] = $query->custom_row_object(0, 'Video');
 
             //get all comments for selected video
-            $query = $this->db->query('SELECT * FROM comments WHERE comments.video_id = ' . $video_id);
+            $query = $this->db->query('SELECT * FROM comments WHERE comments.video_id = ?', array($video_id));
             $data['comments'] = $query->custom_result_object('Comment');
 
             if ($this->input->post()) {
@@ -33,7 +33,7 @@ class Site extends CI_Controller {
                 redirect('site/index/' . $video_id);
             }
             if (isset($comment_id)) {
-                $query = $this->db->query('SELECT * FROM comments WHERE id = ' . $comment_id);
+                $query = $this->db->query('SELECT * FROM comments WHERE id = ?', array($comment_id));
                 $data['editComment'] = $query->row()->comment;
             }
 
@@ -62,7 +62,7 @@ class Site extends CI_Controller {
     }
 
     public function deleteComment($comment_id, $video_id) {
-        $query = $this->db->query('DELETE FROM comments WHERE id = ' . $comment_id);
+        $query = $this->db->query('DELETE FROM comments WHERE id = ?', array($comment_id));
         redirect('site/index/' . $video_id);
     }
 
