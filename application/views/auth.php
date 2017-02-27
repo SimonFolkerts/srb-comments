@@ -10,4 +10,3 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <input type="text" name="password" value="<?php echo set_value('password'); ?>"><br>
     <input type="submit" value="Submit">
 </form>
-
