@@ -1,4 +1,5 @@
 <?php
+
 //TODO make validation part of user model for use with CI validation
 class Auth extends CI_Controller {
 
@@ -8,19 +9,18 @@ class Auth extends CI_Controller {
     }
 
     function index() {
-
         $data = null;
         $this->load->library('form_validation');
-
-
         if ($this->input->post()) {
             $email = $this->input->post('email');
             $user = $this->getUserByEmail($email);
-            $this->form_validation->set_rules('email', 'Email', array('required', 'valid_email', $this->checkUser($user)));
-            $this->form_validation->set_rules('password', 'Password', array('required', $this->checkPassword($user)));
+            $formPassword = $this->input->post('password');
+            $userPassword = $user ? $user->password : null;
+            $userEmail = $user ? $user->email : null;
+            $this->form_validation->set_rules('email', 'Email', array('required', 'valid_email', 'callback_checkUser[' . $userEmail . ']'));
+            $this->form_validation->set_rules('password', 'Password', array('required', 'callback_checkPassword[' . $userPassword . ']'));
             $this->form_validation->run();
         }
-
         $this->loadView('auth', $data);
     }
 
@@ -30,26 +30,20 @@ class Auth extends CI_Controller {
         return $user;
     }
 
-    public function checkUser($user) {
-        if ($user) {
+    public function checkUser($field, $userEmail) {
+        if ($userEmail === $field) {
             return true;
         } else {
-            $this->form_validation->set_message('checkUser', 'There is no account with this email address');
+            $this->form_validation->set_message('checkUser', 'Incorrect Email');
             return false;
         }
     }
 
-    public function checkPassword($user) {
-        if ($user) {
-            $dbPassword = $user->password;
-            $userPassword = $this->input->post('password');
-            if ($dbPassword === $userPassword) {
-                return true;
-            } else {
-                $this->form_validation->set_message('checkPassword', 'Incorrect password');
-                return false;
-            }
+    public function checkPassword($formPassword, $userPassword) {
+        if ($formPassword === $userPassword) {
+            return true;
         } else {
+            var_dump('false');
             $this->form_validation->set_message('checkPassword', 'Incorrect password');
             return false;
         }
